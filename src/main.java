@@ -5,20 +5,22 @@ import java.util.List;
 import java.util.Scanner;
 
 public class main {
-  
+  //prime key
+  static String userPK = "userName";
+  static String conferencePK = "topic";
   //for user user connection
   private String UinsertCmd = "INSERT INTO USER VALUES(?,?)";
   private String UdeleteCmd = "DELETE FROM USER WHERE USERNAME=?";
   private String UupdateCmd = "UPDATE USER SET ";
   private String UselectCmd = "SELECT * FROM USER WHERE ";
   //for conference connection
-  private String CinsertCmd = "INSERT INTO CONFERENCE VALUES(?,?,?,?,?)";
+  private String CinsertCmd = "INSERT INTO CONFERENCE VALUES(?,?,?,?,?,?,?,?)";
   private String CdeleteCmd = "DELETE FROM CONFERENCE WHERE ISBN=?";
   private String CupdateCmd = "UPDATE CONFERENCE SET ";
   private String CselectCmd = "SELECT * FROM CONFERENCE WHERE ";
   //for interest connection
   private String IinsertCmd = "INSERT INTO INTEREST VALUES(?,?,?,?,?,?,?,?,?,?,?)";
-  private String IdeleteCmd = "DELETE FROM INTEREST WHERE URL=?";
+  private String IdeleteCmd = "DELETE FROM INTEREST WHERE TOPIC=?";
   private String IupdateCmd = "UPDATE INTEREST SET ";
   private String IselectCmd = "SELECT * FROM INTEREST WHERE ";
   //initial three databases
@@ -29,24 +31,17 @@ public class main {
   //test
   public static void main(String[] args) throws ClassNotFoundException, SQLException {
     main console = new main();
-    String[] param = new String[3];
-    Scanner in = new Scanner(System.in);
-    param[0] = "2007/05/6";
-    param[1] = "URL";
-    param[2] = "www.baidu.com";
-    //param[2] = "AI";
-    //param[3] = "www.A.org";
-    //param[4] = "2007/07/10";
-    System.out.println("input username and password:");
-    //param[1] = in.next();
-    //param[2] = in.next();
-    console.updateInterest(param);
-    float[] tmp = new float[2]; 
-    tmp[0] = (float) 0.5;
-    tmp[1] = (float) 0.1;
-    param[1] = "uw";
-    param[2] = "hw";
-    console.updateInterest(param, tmp);
+    String[] param = new String[1];
+    //Scanner in = new Scanner(System.in);
+    //String[] aStrings = {"1", "2", "3", "4", "5", "6", "7", "8"};
+    //console.addConference(aStrings);
+    //System.out.println("done!");
+    param[0] = "20171122";
+    List<conference> temp = console.selectConference("deadline", param);
+    for(conference tConference : temp) {
+      System.out.println(tConference.getTopic());
+    }
+    System.out.println("Done!");
     //console.deleteUser(param);
     //console.addConference(param);
   }
@@ -144,8 +139,8 @@ public class main {
    */
   public int addConference(String[] parameter) throws ClassNotFoundException, SQLException{
     String[] temp = new String[1];
-    temp[0] = parameter[3];
-    if(selectConference("URL", temp).size()!=0)
+    temp[0] = parameter[0];
+    if(selectConference(conferencePK, temp).size()!=0)
         return -1;
     conferenceDB.getConnection();
     conferenceDB.executeUpdate(CinsertCmd, parameter);

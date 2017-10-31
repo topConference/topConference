@@ -6,11 +6,14 @@ import java.sql.SQLException;
 
 public class DB {
   private String driver = "com.mysql.jdbc.Driver";
-  private String url = "jdbc:mysql://127.0.0.1:3306/top_conference?useUnicode=true&characterEncoding=utf-8&useSSL=false";
+  //private String url = "jdbc:mysql://127.0.0.1:3306/top_conference?useUnicode=true&characterEncoding=utf-8&useSSL=false";
+  private String url = "jdbc:mysql://do1.bilabila.tk:3306/top_conference";
   private Connection conn = null;
   private PreparedStatement ps = null;
+  //private String userName = "root";
+  private String password = "dilidili";
   private String userName = "root";
-  private String password = "Pengle1997.";
+  //private String password = "Pengle1997.";
   private ResultSet rs = null;
   
   //build connection and return it
