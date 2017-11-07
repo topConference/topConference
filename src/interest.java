@@ -1,7 +1,17 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class interest {
+  //for interest connection
+  public static DB interestDB = new DB();
+  public static String IinsertCmd = "INSERT INTO INTEREST VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+  public static String IdeleteCmd = "DELETE FROM INTEREST WHERE TOPIC=?";
+  private static String IupdateCmd = "UPDATE INTEREST SET ";
+  private static String IselectCmd = "SELECT * FROM INTEREST WHERE ";
+  
+  //single interest
   private String user;
   private String startDate;
   private float sw;
@@ -111,5 +121,81 @@ public class interest {
 
   public void setUser(String user) {
     this.user = user;
+  }
+  
+  /*
+   * interest part including:
+   * deleteInterest: delete a users interest information(when a user is signing out)
+   * selectInterest: select a user's interest from the database
+   * addInterest: add a user's interest(when adding a user)
+   * updateInterest: one for string mode, another for float mode
+   */
+  //parameter: only include one information userName(PK)
+    public static void deleteInterest(String[] parameter) throws ClassNotFoundException, SQLException{
+      //delete conference
+      interestDB.getConnection();
+      interestDB.executeUpdate(IdeleteCmd, parameter);
+      interestDB.closeAll();
+    }
+    /*
+     * column: one of the database column
+     * parameter: the value of the certain column
+     * return the qualified data packed in a list 
+     */
+    public static List<interest> selectInterest(String Column, String[] parameter) throws ClassNotFoundException, SQLException{
+      LinkedList<interest> list = new LinkedList<interest>();
+      interestDB.getConnection();
+      ResultSet rs = interestDB.executeSelect(IselectCmd + Column + "=?", parameter);
+      while(rs.next()){
+          interest temp = new interest(rs);
+          list.add(temp);
+      }
+      interestDB.closeAll();
+      return list;
+    }
+    /*
+     * parameter: the intension of the user(based on the parameter in the interest class)
+     * return 0 if succeed 1 when failed
+     */
+    public static int addInterest(String[] parameter, float[] weight) throws ClassNotFoundException, SQLException{
+      String[] temp = new String[1];
+      temp[0] = parameter[3];
+      if(selectInterest("USERNAME", temp).size()!=0)
+          return -1;
+      interestDB.getConnection();
+      interestDB.executeUpdate(IinsertCmd, parameter, weight);
+      interestDB.closeAll();
+      return 0;
+    }
+    //parameter: the intension of the user(new based on the parameter in the interest class)
+    public static void updateInterest(String[] parameter) throws ClassNotFoundException, SQLException{
+      interestDB.getConnection();
+      //update new information
+      StringBuffer updateCmd = new StringBuffer(IupdateCmd);
+      String[] param = new String[parameter.length/2+1];
+      int len = 0;
+      //get all the parameter & command 
+      for(int i = 1;i<parameter.length;i = i+2){
+          updateCmd.append(parameter[i] + "=?, ");
+          param[len++] = parameter[i+1];
+      }
+      param[len] = parameter[0];//USERNAME
+      interestDB.executeUpdate(updateCmd.toString().substring(0,updateCmd.length()-2)+" where USERNAME=?", param);
+      interestDB.closeAll();
+    }
+    /*
+     * parameter: column of the table start with the PK
+     * weight: the value of the corresponding column 
+     */
+    public static void updateInterest(String[] parameter, float[] weight) throws ClassNotFoundException, SQLException{
+      interestDB.getConnection();
+      //update new information
+      StringBuffer updateCmd = new StringBuffer(IupdateCmd);
+      //get all the parameter & command 
+      for(int i = 1;i<parameter.length;i++){
+          updateCmd.append(parameter[i] + "=?, ");
+      }
+      interestDB.executeUpdate(updateCmd.toString().substring(0,updateCmd.length()-2)+" where USERNAME=" +"'"+ parameter[0] + "'", weight);
+      interestDB.closeAll();
   }
 }
