@@ -88,14 +88,41 @@ public class user {
     return warningInfor;   
   }
   
-  public static void addConference(String user, String conference) throws ClassNotFoundException, SQLException {
+  public static int addConference(String user, String conference) throws ClassNotFoundException, SQLException {
     String[] column = {"ADDEDCON"};
     //get old information
     String[] username = {user};
     List<user> users = selectUser(userPK, username);
     String oldInfor = users.get(0).getConferences();
     //update information
-    oldInfor +="/" + conference;
+    if(oldInfor.contains(conference)) {
+      return -1;//exist already
+    }
+    else {
+      oldInfor +="/" + conference;
+      String[] parameter = {oldInfor, user};
+      updateUser(column, parameter); 
+      return 0;
+    }
+  }
+  
+
+  public static void removeCon(String user, String conference) throws ClassNotFoundException, SQLException {
+    String[] column = {"ADDEDCON"};
+    //get old information
+    String[] username = {user};
+    List<user> users = selectUser(userPK, username);
+    String oldInfor = users.get(0).getConferences();
+    //update information
+    if(oldInfor.contains(conference + "/")) {
+      oldInfor = oldInfor.replaceAll(conference + "/", "");
+    }
+    else if(oldInfor.contains("/"+conference)){
+      oldInfor = oldInfor.replaceAll("/"+conference, "");
+    }
+    else {
+      oldInfor = oldInfor.replaceAll(conference, "");
+    }
     String[] parameter = {oldInfor, user};
     updateUser(column, parameter);
   }
@@ -175,7 +202,7 @@ public class user {
 //    interest.interestDB.closeAll();
     return 0;
   }
-
+  
   public interest getUserInterest() {
     return userInterest;
   }

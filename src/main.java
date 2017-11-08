@@ -1,7 +1,4 @@
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 
 public class main {
@@ -19,8 +16,8 @@ public class main {
     if(result.equals("success!")) {
       System.out.println("add new conference:");
       //String newCon = in.nextLine();
-      String newCon = "mycon";
-      user.addConference(userName, newCon);
+      String newCon = in.nextLine();
+      user.removeCon(userName, newCon);
     } 
   }
 }
