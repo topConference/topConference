@@ -1,3 +1,5 @@
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -20,6 +22,8 @@ public class user {
   private List<conference> StoredCon;
   private interest userInterest;
   private String conferences;
+  //mode
+  private final static String KEY_SHA = "SHA";
   
   //constructor
   public user(String u, String p, List<conference> myCon){
@@ -78,7 +82,7 @@ public class user {
     if(tempU.isEmpty()) {
       warningInfor = "User not exist!";
     }
-    else if(tempU.get(0).getPassWord().equals(password)) {
+    else if(tempU.get(0).getPassWord().equals(encytp(password))) {
       //System.out.println(tempU.get(0).toString());
       warningInfor = "success!";
     }
@@ -192,6 +196,8 @@ public class user {
     if(selectUser("USERNAME", temp).size()!=0)
         return -1;
     userDB.getConnection();
+    //change password
+    parameter[1] = encytp(parameter[1]);
     userDB.executeUpdate(UinsertCmd, parameter);
     userDB.closeAll();
 //    interest.interestDB.getConnection();
@@ -218,5 +224,16 @@ public class user {
   public void setConferences(String conferences) {
     this.conferences = conferences;
   }
+  
+  public static String encytp(String password) {
+    BigInteger sha =null;
+    byte[] inputData = password.getBytes(); 
+    try {
+       MessageDigest messageDigest = MessageDigest.getInstance(KEY_SHA); 
+       messageDigest.update(inputData);
+       sha = new BigInteger(messageDigest.digest()); 
+      } catch (Exception e) {e.printStackTrace();}
+      return sha.toString();
+   }
   
 }
