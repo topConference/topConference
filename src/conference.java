@@ -2,7 +2,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.logging.log4j.core.appender.rolling.SizeBasedTriggeringPolicy;
 
 //时间、地点、主题、URL、deadline
 //topic VARCHAR(190) NOT NULL,
@@ -45,11 +44,14 @@ public class conference {
   }
   
   public conference(ResultSet infor) throws SQLException {
-    dates = infor.getString(1);
-    address = infor.getString(2);
-    topic = infor.getString(3);
-    url = infor.getString(4);
-    deadline = infor.getString(5);
+    topic = infor.getString(1);
+    deadline = infor.getString(2);
+    url = infor.getString(3);
+    dates = infor.getString(4);
+    address = infor.getString(5);
+    img = infor.getString(6);
+    h5index = infor.getString(7);
+    info = infor.getString(8);
   }
   
   public conference() {}

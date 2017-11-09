@@ -92,18 +92,38 @@ public class user {
     return warningInfor;   
   }
   
-  public static int addConference(String user, String conference) throws ClassNotFoundException, SQLException {
+  public static int addConference(String user, String conf, int force) throws ClassNotFoundException, SQLException {
     String[] column = {"ADDEDCON"};
     //get old information
     String[] username = {user};
     List<user> users = selectUser(userPK, username);
     String oldInfor = users.get(0).getConferences();
     //update information
-    if(oldInfor.contains(conference)) {
+    if(oldInfor.contains(conf)) {
       return -1;//exist already
     }
     else {
-      oldInfor +="/" + conference;
+      if(force!=1) {
+        //get conf information
+        String[] temp = {conf};
+        String data = conference.selectConference(conference.conferencePK, temp).get(0).getdates();
+        int begin = Integer.valueOf(data.substring(0, 8));
+        int end = Integer.valueOf(data.substring(8, 16));
+        //search all the added conference
+        String[] conferences = oldInfor.split("/");
+        for(String con : conferences){
+          String[] temp1 = {con};
+          List<conference> existedCon = conference.selectConference(conference.conferencePK, temp1);
+          conference tempCon = existedCon.get(0);//get the added conference
+          String data1 = tempCon.getdates(); 
+          int begin1 = Integer.valueOf(data1.substring(0, 8));
+          int end1 = Integer.valueOf(data1.substring(8, 16));
+          if((begin1>=begin&&begin1<=end1)||(end1>=begin&&end1<=end)) {//check time
+            return -2;
+          }
+        }
+      }
+      oldInfor +="/" + conf;
       String[] parameter = {oldInfor, user};
       updateUser(column, parameter); 
       return 0;
