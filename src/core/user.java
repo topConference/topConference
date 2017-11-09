@@ -1,18 +1,18 @@
+package core;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import javax.print.attribute.standard.RequestingUserName;
-import org.apache.logging.log4j.core.appender.db.jdbc.ColumnConfig;
-import org.omg.CORBA.PUBLIC_MEMBER;
+import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter.Cyan;
 
 public class user {
   //database
-  static String userPK = "userName";
+  public static final String userPK = "userName";
+  public static final String VERTIFY = "TOKEN";
   private static DB userDB = new DB();
-  private static String UinsertCmd = "INSERT INTO USER VALUES(?,?,?)";
+  private static String UinsertCmd = "INSERT INTO USER (USERNAME, PASSWARD) VALUES(?,?)";
   private static String UdeleteCmd = "DELETE FROM USER WHERE USERNAME=?";
   private static String UupdateCmd = "UPDATE USER SET ";
   private static String UselectCmd = "SELECT * FROM USER WHERE ";
@@ -22,6 +22,7 @@ public class user {
   private List<conference> StoredCon;
   private interest userInterest;
   private String conferences;
+  private String token;
   //mode
   private final static String KEY_SHA = "SHA";
   
@@ -42,6 +43,7 @@ public class user {
     userName = infor.getString(1);
     passWord = infor.getString(2);
     conferences = infor.getString(3);
+    token = infor.getString(4);
   }
   
   public user() {}
@@ -75,28 +77,30 @@ public class user {
    * password: the user's password
    * return: 
    */
-  public static String logIn(String userName, String password) throws ClassNotFoundException, SQLException { 
+  public static int logIn(String userName, String password, String token) throws ClassNotFoundException, SQLException { 
     String[] name = {userName};
-    String warningInfor;
-    List<user> tempU = selectUser(userPK, name);
+    String[] pk = {userPK};
+    List<user> tempU = selectUser(pk, name);
     if(tempU.isEmpty()) {
-      warningInfor = "User not exist!";
+      return -2;
     }
     else if(tempU.get(0).getPassWord().equals(encytp(password))) {
-      //System.out.println(tempU.get(0).toString());
-      warningInfor = "success!";
+      String[] temp = {encytp(token), userName};
+      String[] restriction = {VERTIFY};
+      updateUser(restriction, temp);
+      return 0;
     }
     else {
-      warningInfor = "wrong password!";
+      return -1;
     }
-    return warningInfor;   
   }
   
   public static int addConference(String user, String conf, int force) throws ClassNotFoundException, SQLException {
     String[] column = {"ADDEDCON"};
     //get old information
     String[] username = {user};
-    List<user> users = selectUser(userPK, username);
+    String[] pk = {userPK};
+    List<user> users = selectUser(pk, username);
     String oldInfor = users.get(0).getConferences();
     //update information
     if(oldInfor.contains(conf)) {
@@ -106,18 +110,18 @@ public class user {
       if(force!=1) {
         //get conf information
         String[] temp = {conf};
-        String data = conference.selectConference(conference.conferencePK, temp).get(0).getdates();
-        int begin = Integer.valueOf(data.substring(0, 8));
-        int end = Integer.valueOf(data.substring(8, 16));
+        String[] Cpk = {conference.conferencePK};
+        conference tempCon = conference.selectConference(Cpk, temp).get(0);
+        int begin = Integer.valueOf(tempCon.getStart_date());
+        int end = Integer.valueOf(tempCon.getEnd_date());
         //search all the added conference
         String[] conferences = oldInfor.split("/");
         for(String con : conferences){
           String[] temp1 = {con};
-          List<conference> existedCon = conference.selectConference(conference.conferencePK, temp1);
-          conference tempCon = existedCon.get(0);//get the added conference
-          String data1 = tempCon.getdates(); 
-          int begin1 = Integer.valueOf(data1.substring(0, 8));
-          int end1 = Integer.valueOf(data1.substring(8, 16));
+          List<conference> existedCon = conference.selectConference(Cpk, temp1);
+          tempCon = existedCon.get(0);//get the added conference
+          int begin1 = Integer.valueOf(tempCon.getStart_date());
+          int end1 = Integer.valueOf(tempCon.getEnd_date());
           if((begin1>=begin&&begin1<=end1)||(end1>=begin&&end1<=end)) {//check time
             return -2;
           }
@@ -135,7 +139,8 @@ public class user {
     String[] column = {"ADDEDCON"};
     //get old information
     String[] username = {user};
-    List<user> users = selectUser(userPK, username);
+    String[] pk = {userPK};
+    List<user> users = selectUser(pk, username);
     String oldInfor = users.get(0).getConferences();
     //update information
     if(oldInfor.contains(conference + "/")) {
@@ -175,10 +180,15 @@ public class user {
    * parameter: the value of the certain column
    * return the qualified data packed in a list 
    */
-  public static List<user> selectUser(String Column, String[] parameter) throws ClassNotFoundException, SQLException{
+  public static List<user> selectUser(String[] Column, String[] parameter) throws ClassNotFoundException, SQLException{
     LinkedList<user> list = new LinkedList<user>();
     userDB.getConnection();
-    ResultSet rs = userDB.executeSelect(UselectCmd + Column + "=?", parameter);
+    String restrict = new String();
+    for(String col : Column) {
+      restrict += (col + "=? and ");
+    }
+    restrict = restrict.substring(0, restrict.length()-5);
+    ResultSet rs = userDB.executeSelect(UselectCmd + restrict, parameter);
     while(rs.next()){
         user temp = new user(rs);
         list.add(temp);
@@ -213,7 +223,8 @@ public class user {
     //DatabaseMetaData dbMeta = (DatabaseMetaData) userDB.getConnection().getMetaData();
     //ResultSet pkRSet = dbMeta.getPrimaryKeys(null, null, "user"); 
     //String primeKey = pkRSet.getString(0);
-    if(selectUser("USERNAME", temp).size()!=0)
+    String[] pk = {userPK};
+    if(selectUser(pk, temp).size()!=0)
         return -1;
     userDB.getConnection();
     //change password
@@ -255,5 +266,13 @@ public class user {
       } catch (Exception e) {e.printStackTrace();}
       return sha.toString();
    }
+
+  public String getToken() {
+    return token;
+  }
+
+  public void setToken(String token) {
+    this.token = token;
+  }
   
 }
