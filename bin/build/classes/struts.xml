@@ -6,7 +6,7 @@
     <!--<constant name="struts.devMode" value="true"/>-->
     <constant name="struts.enable.DynamicMethodInvocation" value="true"/>
     <package name="default" extends="json-default" namespace="/api" strict-method-invocation="false">
-        <action name="*" class="api.AllConfAction">
+        <action name="getAllCon" class="api.AllConfAction" method = "allCon">
             <result type="json"/>
         </action>
     </package>
