@@ -67,26 +67,5 @@ function initialize()
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
-function synchronizationCoordinate() {
-    var url = "http://maps.google.com/maps/api/geocode/json?address=" + encodeURIComponent($('#<%= txtAddress.ClientID %>').val()) + "&sensor=false" + "&randomNum=" + Math.random();
-    $.ajax({
-        url: url,
-        dataType: 'json',
-        success: function(data) {
-            if (data.status == 'OK') {
-//经度
-                $('#<%= txtLongitude.ClientID %>').val(data.results[0].geometry.location.lng);
-//纬度
-                $('#<%= txtLatitude.ClientID %>').val(data.results[0].geometry.location.lat);
-            }
-            else {
-                alert("没找到你要查询的位置，请重新输入！");
-            }
-        },
-        error: function() {
-            alert("网络繁忙，请重试！");
-        }
-    });
-}
 </script>
 </html>

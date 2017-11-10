@@ -57,6 +57,14 @@ public class userConfAction extends ActionSupport{
     return SUCCESS;
   }
   
+  public String addConference() throws ClassNotFoundException, SQLException {
+    for(conference tConference : conferences) {
+      String topic = tConference.getTopic();
+      conference.addConference(tConference);
+    }
+    return SUCCESS;
+  }
+  
   //getter & setter
   public String getUsername() {
     return username;
@@ -76,6 +84,4 @@ public class userConfAction extends ActionSupport{
   public void setConferences(List<conference> conferences) {
     this.conferences = conferences;
   }
-  
-  
 }

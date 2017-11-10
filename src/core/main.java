@@ -21,34 +21,33 @@ public class main {
 //    test1.setPassword(password1);
 //    test1.signUp();
     //-------------test login----------------
-    loginAction test = new loginAction();
-    String username = "pl";//in.nextLine();
-    String password = "666";//in.nextLine();
-    test.setUserName(username);
-    test.setPassword(password);
-    System.out.println(test.login());
+//    loginAction test = new loginAction();
+//    String username = "pl";//in.nextLine();
+//    String password = "666";//in.nextLine();
+//    test.setUserName(username);
+//    test.setPassword(password);
+//    System.out.println(test.login());
   //-------------test get users' con----------------
-    userConfAction test2 = new userConfAction();
-    test2.setUsername(username);
-    test2.setToken(test.getToken());
-    test2.userCon();
-    List<conference> temp = test2.getConferences();
-    for(conference tConference : temp) {
-      System.out.println(tConference.getTopic());
-    }
-    //-------------Test get AllConfAction -----------
-//    AllConfAction test3 = new AllConfAction();
-//    test3.allCon();
-//    List<conference> temp = test3.getConferences();
+//    userConfAction test2 = new userConfAction();
+//    test2.setUsername(username);
+//    test2.setToken(test.getToken());
+//    test2.userCon();
+//    List<conference> temp = test2.getConferences();
 //    for(conference tConference : temp) {
 //      System.out.println(tConference.getTopic());
 //    }
-    conference temp1 = new conference();
-    temp1.setTopic("pl");
-    List<conference> tConferences = new ArrayList<>();
-    tConferences.add(temp1);
-    test2.setConferences(tConferences);
-    test2.updateUserCon();
+    //-------------Test get AllConfAction -----------
+    AllConfAction test3 = new AllConfAction();
+    test3.allCon();
+    List<conference> temp = test3.getConferences();
+    for(conference tConference : temp) {
+      System.out.println(tConference.getTopic());
+    }
+//    conference temp1 = new conference("asfed","asfed","asfed","asfed","asfed","asfed","asfed","asfed","asfed");
+//    List<conference> tConferences = new ArrayList<>();
+//    tConferences.add(temp1);
+//    test2.setConferences(tConferences);
+//    test2.addConference();
     System.out.println("Done!");
     
   }

@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE struts PUBLIC
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
         "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
         "http://struts.apache.org/dtds/struts-2.5.dtd">
 <struts>
-
-   <constant name="struts.devMode" value="true" />
-   <constant name="struts.multipart.maxSize" value="1000000" />
-
-   <package name="helloworld" extends="struts-default">
-   </package>
-   
+    <!--<constant name="struts.devMode" value="true"/>-->
+    <constant name="struts.enable.DynamicMethodInvocation" value="true"/>
+    <package name="default" extends="json-default" namespace="/api" strict-method-invocation="false">
+        <action name="getAllCon" class="api.AllConfAction" method = "allCon">
+            <result type="json"/>
+        </action>
+    </package>
 </struts>

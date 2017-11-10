@@ -3,6 +3,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import javax.security.auth.callback.LanguageCallback;
+import api.loginAction;
 
 //时间、地点、主题、URL、deadline
 //topic VARCHAR(190) NOT NULL,
@@ -153,6 +155,31 @@ public class conference {
     String[] Cpk = {conferencePK};
     if(selectConference(Cpk, temp).size()!=0)
         return -1;
+    conferenceDB.getConnection();
+    conferenceDB.executeUpdate(CinsertCmd, parameter);
+    conferenceDB.closeAll();
+    return 0;
+  }
+  
+  public static int addConference(conference con) throws ClassNotFoundException, SQLException{
+    String[] temp = new String[1];
+    temp[0] = con.getTopic();
+    String[] Cpk = {conferencePK};
+    List<conference> cons = selectConference(Cpk, temp);
+    for(conference tConference : cons) {
+      if(tConference.equals(con))
+        return -1;
+    }
+    String[] parameter = new String[9];
+    parameter[0] = con.getTopic();
+    parameter[1] = con.getDeadline();
+    parameter[2] = con.getStart_date();
+    parameter[3] = con.getEnd_date();
+    parameter[4] = con.getUrl();
+    parameter[5] = con.getaddress();
+    parameter[6] = con.getImg();
+    parameter[7] = con.getH5index();
+    parameter[8] = con.getType();
     conferenceDB.getConnection();
     conferenceDB.executeUpdate(CinsertCmd, parameter);
     conferenceDB.closeAll();
