@@ -1,7 +1,10 @@
+package core;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import javax.security.auth.callback.LanguageCallback;
+import api.loginAction;
 
 //时间、地点、主题、URL、deadline
 //topic VARCHAR(190) NOT NULL,
@@ -13,56 +16,55 @@ import java.util.List;
 //h5index VARCHAR(5) NOT NULL,
 //info TEXT NOT NULL,
 public class conference {
-  static String conferencePK = "topic";
+  public static final String conferencePK = "topic";
+  public static final String publicConf = "public";
+  public static final String GENUS = "TYPE";
   //for conference connection
   private static DB conferenceDB = new DB();
-  private static String CinsertCmd = "INSERT INTO CONFERENCE VALUES(?,?,?,?,?,?,?,?)";
-  private static String CdeleteCmd = "DELETE FROM CONFERENCE WHERE ISBN=?";
+  private static String CinsertCmd = "INSERT INTO CONFERENCE VALUES(?,?,?,?,?,?,?,?,?)";
+  private static String CdeleteCmd = "DELETE FROM CONFERENCE WHERE ";
   private static String CupdateCmd = "UPDATE CONFERENCE SET ";
   private static String CselectCmd = "SELECT * FROM CONFERENCE WHERE ";
   
-  private String dates;
   private String address;
   private String topic;
   private String url;
   private String deadline;
   private String img;
   private String h5index;
-  private String info;
+  private String start_date;
+  private String end_date;
+  private String type;
   
   
   //constructor
-  public conference(String s, String h, String t, String u, String d, String i, String h5, String in) {
-    dates = s;
+  public conference(String start, String end, String h, String t, String u, String d, String i, String h5, String ty) {
+    start_date = start;
+    end_date = end;
     address = d;
     topic = t;
     url = u;
     deadline = d;
     img = i;
     h5index = h5;
-    info = in;
+    setType(ty);
   }
   
   public conference(ResultSet infor) throws SQLException {
     topic = infor.getString(1);
     deadline = infor.getString(2);
-    url = infor.getString(3);
-    dates = infor.getString(4);
-    address = infor.getString(5);
-    img = infor.getString(6);
-    h5index = infor.getString(7);
-    info = infor.getString(8);
+    start_date = infor.getString(3);
+    end_date = infor.getString(4);
+    url = infor.getString(5);
+    address = infor.getString(6);
+    img = infor.getString(7);
+    h5index = infor.getString(8);
+    setType(infor.getString(9));
   }
   
   public conference() {}
   
   //getter and setter
-  public String getdates() {
-    return dates;
-  }
-  public void setdates(String startDate) {
-    this.dates = startDate;
-  }
   public String getaddress() {
     return address;
   }
@@ -103,14 +105,6 @@ public class conference {
   public void setH5index(String h5index) {
     this.h5index = h5index;
   }
-
-  public String getInfo() {
-    return info;
-  }
-
-  public void setInfo(String info) {
-    this.info = info;
-  }
   
   /*
    * conference part including:
@@ -119,10 +113,15 @@ public class conference {
    * addConference: add a new conference to the database
    */
   //parameter: only include one information userName(PK)
-  public static void deleteConference(String[] parameter) throws ClassNotFoundException, SQLException{
+  public static void deleteConference(String[] colunms, String[] parameter) throws ClassNotFoundException, SQLException{
     //delete conference
+    String request = new String();
+    for(String aString : colunms) {
+      request += aString + "=? and ";
+    }
+    request =request.substring(0, request.length()-5);
     conferenceDB.getConnection();
-    conferenceDB.executeUpdate(CdeleteCmd, parameter);
+    conferenceDB.executeUpdate(CdeleteCmd + request, parameter);
     conferenceDB.closeAll();
   }
   /*
@@ -130,10 +129,15 @@ public class conference {
    * parameter: the value of the certain column
    * return the qualified data packed in a list 
    */
-  public static List<conference> selectConference(String Column, String[] parameter) throws ClassNotFoundException, SQLException{
+  public static List<conference> selectConference(String[] Column, String[] parameter) throws ClassNotFoundException, SQLException{
     LinkedList<conference> list = new LinkedList<conference>();
     conferenceDB.getConnection();
-    ResultSet rs = conferenceDB.executeSelect(CselectCmd + Column + "=?", parameter);
+    String restrict = new String();
+    for(String col : Column) {
+      restrict += (col + "=? and ");
+    }
+    restrict = restrict.substring(0, restrict.length()-5);
+    ResultSet rs = conferenceDB.executeSelect(CselectCmd + restrict, parameter);
     while(rs.next()){
         conference temp = new conference(rs);
         list.add(temp);
@@ -148,12 +152,62 @@ public class conference {
   public static int addConference(String[] parameter) throws ClassNotFoundException, SQLException{
     String[] temp = new String[1];
     temp[0] = parameter[0];
-    if(selectConference(conferencePK, temp).size()!=0)
+    String[] Cpk = {conferencePK};
+    if(selectConference(Cpk, temp).size()!=0)
         return -1;
     conferenceDB.getConnection();
     conferenceDB.executeUpdate(CinsertCmd, parameter);
     conferenceDB.closeAll();
     return 0;
+  }
+  
+  public static int addConference(conference con) throws ClassNotFoundException, SQLException{
+    String[] temp = new String[1];
+    temp[0] = con.getTopic();
+    String[] Cpk = {conferencePK};
+    List<conference> cons = selectConference(Cpk, temp);
+    for(conference tConference : cons) {
+      if(tConference.equals(con))
+        return -1;
+    }
+    String[] parameter = new String[9];
+    parameter[0] = con.getTopic();
+    parameter[1] = con.getDeadline();
+    parameter[2] = con.getStart_date();
+    parameter[3] = con.getEnd_date();
+    parameter[4] = con.getUrl();
+    parameter[5] = con.getaddress();
+    parameter[6] = con.getImg();
+    parameter[7] = con.getH5index();
+    parameter[8] = con.getType();
+    conferenceDB.getConnection();
+    conferenceDB.executeUpdate(CinsertCmd, parameter);
+    conferenceDB.closeAll();
+    return 0;
+  }
+
+  public String getStart_date() {
+    return start_date;
+  }
+
+  public void setStart_date(String start_date) {
+    this.start_date = start_date;
+  }
+
+  public String getEnd_date() {
+    return end_date;
+  }
+
+  public void setEnd_date(String end_date) {
+    this.end_date = end_date;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 
 }

@@ -1,50 +1,71 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-  <meta http-equiv="content-type" content="text/html;charset=utf-8">
-  <title>Google Map</title>
-  <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-  <script type="text/javascript">
-    function init()
-    {
-      // 获取当前位置
-      navigator.geolocation.getCurrentPosition(function(position)
-        {
-          var coords = position.coords;
-          // 设定地图参数，将当前位置的经纬度设置为中心点
-          var latlng = new google.maps.LatLng(coords.latitude,coords.longitude);
-          var myOptions = 
-          {
-            // 放大倍数
-            zoom:14, 
-            // 标注坐标
-            center:latlng,
-            // 地图类型
-            mapTypeId:google.maps.MapTypeId.ROADMAP
-          };
-          var map1;
-          // 显示地图
-          map1 = new google.maps.Map(document.getElementById('map'),myOptions);
-          // 创建标记
-          var marker = new google.maps.Marker(
-            {
-              position:latlng,
-              map:map1
-            });
-          // 设定标注窗口，附上注释文字
-          var infowindow = new google.maps.InfoWindow(
-            {
-              content:"当前位置"
-            });
-          // 打开标注窗口
-          infowindow.open(map1,marker);
-        });
-    }
-  </script>
+<script
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzE9xAESye6Kde-3hT-6B90nfwUkcS8Yw&sensor=false">
+</script>
+<script src = "js/googleMap.js"></script>
+<script src = "https://maps.googleapis.com/maps/api/geocode/outputFormat?parameters"></script>
+<script src="js/jquery.min.js"></script>
 </head>
-<body onload="init()">
-  <div id="map"></div>
+
+<body>
+<div id="googleMap" style="width:500px;height:380px;"></div>
+<div>
+<input type = "text" id = "input_val"></input>
+<input type = "button" id = "btn_sub"></input>
+</div>
+ 
 </body>
+
+<script>
+$("#btn_sub").click(function(){//jQuery捕获点击动作
+    myplace=$("#input_val").val();//获取输入的地址
+    var geocoder = new google.maps.Geocoder();//创建geocoder服务
+    /* 调用geocoder服务完成转换 */
+    geocoder.geocode( { 'address': myplace}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+        map.setCenter(results[0].geometry.location);
+        marker = new google.maps.Marker({
+            map: map,
+            position: results[0].geometry.location
+        });
+        infowindow = new google.maps.InfoWindow({
+            content: results[0].geometry.location.lat()+' , '+results[0].geometry.location.lng(),
+            maxWidth: 200
+        });
+        google.maps.event.addListener(marker, 'click', function() {
+            infowindow.open(map,marker);
+        });
+    } else {
+        alert('Geocode was not successful for the following reason: ' + status);
+    }
+    });
+});
+</script>
+
+<script>
+var myCenter=new google.maps.LatLng(51.508742,-0.120850);
+
+function initialize()
+{
+	//var address=$("#input_val").val();
+	//geocoder.getLatLng(address, callback);  
+	var mapProp = {
+	  center:myCenter,
+	  zoom:5,
+	  mapTypeId:google.maps.MapTypeId.ROADMAP
+	  };
+	
+	var map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
+	
+	var marker=new google.maps.Marker({
+	  position:myCenter,
+	  });
+	
+	marker.setMap(map);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+</script>
 </html>
