@@ -20,10 +20,9 @@ public class conference {
   //for conference connection
   private static DB conferenceDB = new DB();
   private static String CinsertCmd = "INSERT INTO CONFERENCE VALUES(?,?,?,?,?,?,?,?,?)";
-  private static String CdeleteCmd = "DELETE FROM CONFERENCE WHERE ISBN=?";
+  private static String CdeleteCmd = "DELETE FROM CONFERENCE WHERE ";
   private static String CupdateCmd = "UPDATE CONFERENCE SET ";
   private static String CselectCmd = "SELECT * FROM CONFERENCE WHERE ";
-  private static String SelectAll = "SELECT * FROM CONFERENCE";
   
   private String address;
   private String topic;
@@ -112,10 +111,15 @@ public class conference {
    * addConference: add a new conference to the database
    */
   //parameter: only include one information userName(PK)
-  public static void deleteConference(String[] parameter) throws ClassNotFoundException, SQLException{
+  public static void deleteConference(String[] colunms, String[] parameter) throws ClassNotFoundException, SQLException{
     //delete conference
+    String request = new String();
+    for(String aString : colunms) {
+      request += aString + "=? and ";
+    }
+    request =request.substring(0, request.length()-5);
     conferenceDB.getConnection();
-    conferenceDB.executeUpdate(CdeleteCmd, parameter);
+    conferenceDB.executeUpdate(CdeleteCmd + request, parameter);
     conferenceDB.closeAll();
   }
   /*
@@ -177,10 +181,6 @@ public class conference {
 
   public void setType(String type) {
     this.type = type;
-  }
-  
-  public static void selectAllConf() {
-    
   }
 
 }

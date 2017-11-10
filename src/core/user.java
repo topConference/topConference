@@ -85,7 +85,7 @@ public class user {
       return -2;
     }
     else if(tempU.get(0).getPassWord().equals(encytp(password))) {
-      String[] temp = {encytp(token), userName};
+      String[] temp = {token, userName};
       String[] restriction = {VERTIFY};
       updateUser(restriction, temp);
       return 0;

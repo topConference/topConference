@@ -1,7 +1,10 @@
 package core;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import com.opensymphony.xwork2.util.finder.Test;
+import api.AllConfAction;
 import api.loginAction;
 import api.signupAction;
 import api.userConfAction;
@@ -33,6 +36,20 @@ public class main {
     for(conference tConference : temp) {
       System.out.println(tConference.getTopic());
     }
+    //-------------Test get AllConfAction -----------
+//    AllConfAction test3 = new AllConfAction();
+//    test3.allCon();
+//    List<conference> temp = test3.getConferences();
+//    for(conference tConference : temp) {
+//      System.out.println(tConference.getTopic());
+//    }
+    conference temp1 = new conference();
+    temp1.setTopic("pl");
+    List<conference> tConferences = new ArrayList<>();
+    tConferences.add(temp1);
+    test2.setConferences(tConferences);
+    test2.updateUserCon();
     System.out.println("Done!");
+    
   }
 }

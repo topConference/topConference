@@ -14,7 +14,7 @@ public class userConfAction extends ActionSupport{
   
   public String userCon() throws ClassNotFoundException, SQLException {
     String[] restrict = {user.userPK, user.VERTIFY};
-    String[] parameter = {username, user.encytp(token)};
+    String[] parameter = {username, token};
     user u = user.selectUser(restrict, parameter).get(0);
     if(u!=null) {
     //get all public conference
@@ -30,6 +30,29 @@ public class userConfAction extends ActionSupport{
       String[] temp = {username};
       String[] r = {conference.GENUS};
       conferences.addAll(conference.selectConference(r, temp));
+    }
+    return SUCCESS;
+  }
+  
+  public String updateUserCon() throws ClassNotFoundException, SQLException {
+    //if the user is qualified
+    String[] r = {user.userPK, user.VERTIFY};
+    String[] parameter = {username, token};
+    user temp = user.selectUser(r, parameter).get(0);
+    if(temp==null) {
+      return ERROR;
+    }
+    String publicCon = temp.getConferences();
+    for(conference tConference : conferences) {
+      String topic = tConference.getTopic();
+      if(publicCon.contains(topic)) {//public conference
+        user.removeCon(username, topic);
+      }
+      else {//private conference
+        String[] columns = {conference.GENUS};
+        String[] param = {username};
+        conference.deleteConference(columns, param);
+      }
     }
     return SUCCESS;
   }

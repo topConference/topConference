@@ -12,7 +12,7 @@ public class loginAction extends ActionSupport{
   //login
  public String login() throws ClassNotFoundException, SQLException {
    java.util.Random r=new java.util.Random(); 
-   token = String.valueOf(r.nextInt());
+   token = user.encytp(String.valueOf(r.nextInt()));
    int result = user.logIn(userName, password, token);
    if(result == 0) {
      return SUCCESS;
